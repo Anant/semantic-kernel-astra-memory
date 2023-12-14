@@ -76,7 +76,7 @@ class AstraDBMemoryStore(MemoryStoreBase):
         Returns:
             List[str] -- The list of collections.
         """
-        return self.get_collections(False)
+        return self.get_collections()
 
     async def create_collection_async(
         self,
@@ -182,7 +182,10 @@ class AstraDBMemoryStore(MemoryStoreBase):
         filter = {"_id": key}
         documents = self._client.find_documents(
             collection_name=collection_name, filter=filter, include_vector=with_embedding)
-        return parse_payload(documents[0])
+        if documents:
+           return parse_payload(documents[0])
+        else:
+           return parse_payload({})
 
     async def get_batch_async(
         self, collection_name: str, keys: List[str], with_embeddings: bool = False
