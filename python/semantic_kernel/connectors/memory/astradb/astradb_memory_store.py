@@ -34,7 +34,7 @@ class AstraDBMemoryStore(MemoryStoreBase):
         keyspace_name: str,
         embedding_dim: int,
         similarity: str,
-        logger: Optional[Logger] = None,
+        logger: Optional[logging.Logger] = None,
     ) -> None:
         """Initializes a new instance of the AstraDBMemoryStore class.
 
