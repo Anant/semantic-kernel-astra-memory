@@ -33,15 +33,14 @@ class AstraClient:
     def _run_query(self, request_url: str, query: Dict):
         async with aiohttp.ClientSession() as session:
             async with session.post(request_url, data=json.dumps(query), headers = self.request_header ) as response:
-
-            if response.status == 200:
-                response_dict = await response.json()
-                if "errors" in response_dict:
-                    raise Exception(f"Astra DB request error - {response_dict['errors']}")
+                if response.status == 200:
+                    response_dict = await response.json()
+                    if "errors" in response_dict:
+                        raise Exception(f"Astra DB request error - {response_dict['errors']}")
+                    else:
+                        return response_dict
                 else:
-                    return response_dict
-            else:
-                raise Exception(f"Astra DB not available. Status code: {response.status_code}, {response.text}")
+                    raise Exception(f"Astra DB not available. Status code: {response.status_code}, {response.text}")
 
     def find_collections(self, include_detail: bool = True):
         query = {"findCollections": {"options": {"explain": include_detail}}}
