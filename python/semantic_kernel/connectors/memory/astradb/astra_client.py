@@ -30,7 +30,7 @@ class AstraClient:
 
         # async with session.get(request_base_url, params=params, headers=request_header) as response:
 
-    def _run_query(self, request_url: str, query: Dict):
+    async def _run_query(self, request_url: str, query: Dict):
         async with aiohttp.ClientSession() as session:
             async with session.post(request_url, data=json.dumps(query), headers = self.request_header ) as response:
                 if response.status == 200:
