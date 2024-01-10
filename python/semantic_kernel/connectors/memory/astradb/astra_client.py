@@ -1,9 +1,10 @@
-import requests
 import json
 from typing import Any, Dict, List, Optional, Union
 
 import aiohttp
 import asyncio
+import nest_asyncio
+nest_asyncio.apply()
 
 class AstraClient:
     def __init__(
@@ -28,8 +29,6 @@ class AstraClient:
             "Content-Type": "application/json",
         }
 
-        # async with session.get(request_base_url, params=params, headers=request_header) as response:
-
     async def _run_query(self, request_url: str, query: Dict):
         async with aiohttp.ClientSession() as session:
             async with session.post(request_url, data=json.dumps(query), headers = self.request_header ) as response:
@@ -45,12 +44,16 @@ class AstraClient:
     def find_collections(self, include_detail: bool = True):
         query = {"findCollections": {"options": {"explain": include_detail}}}
         result = asyncio.run(self._run_query(self.request_base_url, query))
-
-        return result["status"]["collections"]
+        return result.get("status").get("collections")
 
     def find_collection(self, collection_name: str):
         collections = self.find_collections(False)
-        return collection_name in collections
+        found = False
+        for collection in collections:
+            if collection == collection_name:
+                found = True
+                break
+        return found
 
     def create_collection(self, collection_name: str, embedding_dim: Optional[int] = None, similarity_function: Optional[str] = None):
         query = {"createCollection": {
