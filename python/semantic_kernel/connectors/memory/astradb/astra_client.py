@@ -39,7 +39,7 @@ class AstraClient:
                     else:
                         return response_dict
                 else:
-                    raise Exception(f"Astra DB not available. Status code: {response.status_code}, {response.text}")
+                    raise Exception(f"Astra DB not available. Status : {response}")
 
     def find_collections(self, include_detail: bool = True):
         query = {"findCollections": {"options": {"explain": include_detail}}}
