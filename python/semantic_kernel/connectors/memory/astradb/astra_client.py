@@ -6,6 +6,8 @@ import asyncio
 import nest_asyncio
 nest_asyncio.apply()
 
+from semantic_kernel.connectors.memory.astradb.utils import AsyncSession
+
 class AstraClient:
     def __init__(
         self,
@@ -28,9 +30,10 @@ class AstraClient:
             "x-cassandra-token": self.astra_application_token,
             "Content-Type": "application/json",
         }
+        self.session: Optional[aiohttp.ClientSession] = None
 
     async def _run_query(self, request_url: str, query: Dict):
-        async with aiohttp.ClientSession() as session:
+        async with AsyncSession(self.session) as session:
             async with session.post(request_url, data=json.dumps(query), headers = self.request_header ) as response:
                 if response.status == 200:
                     response_dict = await response.json()
@@ -44,7 +47,7 @@ class AstraClient:
     def find_collections(self, include_detail: bool = True):
         query = {"findCollections": {"options": {"explain": include_detail}}}
         result = asyncio.run(self._run_query(self.request_base_url, query))
-        return result.get("status").get("collections")
+        return result["status"]["collections"]
 
     def find_collection(self, collection_name: str):
         collections = self.find_collections(False)
