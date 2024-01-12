@@ -17,6 +17,7 @@ class AstraClient:
         keyspace_name: str,
         embedding_dim: int,
         similarity_function: str,
+        session: Optional[aiohttp.ClientSession] = None
     ):
         self.astra_id = astra_id
         self.astra_application_token = astra_application_token
@@ -30,10 +31,10 @@ class AstraClient:
             "x-cassandra-token": self.astra_application_token,
             "Content-Type": "application/json",
         }
-        self.session: Optional[aiohttp.ClientSession] = None
+        self._session = session
 
     async def _run_query(self, request_url: str, query: Dict):
-        async with AsyncSession(self.session) as session:
+        async with AsyncSession(self._session) as session:
             async with session.post(request_url, data=json.dumps(query), headers = self.request_header ) as response:
                 if response.status == 200:
                     response_dict = await response.json()

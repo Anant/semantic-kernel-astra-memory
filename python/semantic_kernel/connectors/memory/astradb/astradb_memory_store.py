@@ -13,6 +13,8 @@ from semantic_kernel.connectors.memory.astradb.utils import (
 from semantic_kernel.memory.memory_record import MemoryRecord
 from semantic_kernel.memory.memory_store_base import MemoryStoreBase
 
+import aiohttp
+
 MAX_DIMENSIONALITY = 20000
 MAX_UPSERT_BATCH_SIZE = 100
 MAX_QUERY_WITHOUT_METADATA_BATCH_SIZE = 10000
@@ -35,6 +37,7 @@ class AstraDBMemoryStore(MemoryStoreBase):
         embedding_dim: int,
         similarity: str,
         logger: Optional[logging.Logger] = None,
+        session: Optional[aiohttp.ClientSession] = None
     ) -> None:
         """Initializes a new instance of the AstraDBMemoryStore class.
 
@@ -46,9 +49,11 @@ class AstraDBMemoryStore(MemoryStoreBase):
             embedding_dim {int} -- The dimensionality to use for new collections.
             similarity {str} -- TODO
             logger {Optional[Logger]} -- The logger to use. (default: {None})
+            session -- OPtional session parameter
         """
         self._embedding_dim = embedding_dim
         self._similarity = similarity
+        self._session = session
 
         if self._embedding_dim > MAX_DIMENSIONALITY:
             raise ValueError(
@@ -57,7 +62,7 @@ class AstraDBMemoryStore(MemoryStoreBase):
             )
 
         self._client = AstraClient(
-            astra_id=astra_id, astra_region=astra_region, astra_application_token=astra_application_token, keyspace_name=keyspace_name, embedding_dim=embedding_dim, similarity_function=similarity)
+            astra_id=astra_id, astra_region=astra_region, astra_application_token=astra_application_token, keyspace_name=keyspace_name, embedding_dim=embedding_dim, similarity_function=similarity, session=self._session)
 
     def get_collections(self) -> List[str]:
         """Gets the list of collections.
