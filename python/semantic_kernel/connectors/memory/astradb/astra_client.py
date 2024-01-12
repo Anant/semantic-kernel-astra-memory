@@ -2,9 +2,6 @@ import json
 from typing import Any, Dict, List, Optional, Union
 
 import aiohttp
-import asyncio
-import nest_asyncio
-nest_asyncio.apply()
 
 from semantic_kernel.connectors.memory.astradb.utils import AsyncSession
 
