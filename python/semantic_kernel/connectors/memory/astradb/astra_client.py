@@ -49,8 +49,8 @@ class AstraClient:
         result = await (self._run_query(self.request_base_url, query))
         return result["status"]["collections"]
 
-    def find_collection(self, collection_name: str):
-        collections = self.find_collections(False)
+    async def find_collection(self, collection_name: str):
+        collections = await self.find_collections(False)
         found = False
         for collection in collections:
             if collection == collection_name:

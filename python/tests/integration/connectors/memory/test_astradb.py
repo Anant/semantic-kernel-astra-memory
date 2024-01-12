@@ -94,12 +94,14 @@ def memory_record3():
         timestamp="timestamp",
     )
 
-
-def test_constructor(get_astradb_config):
+@pytest.mark.asyncio
+async def test_constructor(get_astradb_config):
     app_token, db_id, region, keyspace = get_astradb_config
     memory = AstraDBMemoryStore(
         app_token, db_id, region, keyspace, 2, "cosine")
-    assert memory.get_collections() is not None
+    result = await retry(lambda: memory.get_collections())
+    
+    assert result is not None
 
 
 @pytest.mark.asyncio
@@ -113,6 +115,7 @@ async def test_create_and_get_collection_async(get_astradb_config):
 
     await retry(lambda: memory.create_collection_async("test_collection"))
     result = await retry(lambda: memory.does_collection_exist_async("test_collection"))
+    print(result)
     assert result is not None
     assert result == True
 
@@ -128,6 +131,7 @@ async def test_get_collections_async(get_astradb_config):
 
     await retry(lambda: memory.create_collection_async("test_collection"))
     result = await retry(lambda: memory.get_collections_async())
+    print(result)
     assert "test_collection" in result
 
 
@@ -179,6 +183,7 @@ async def test_upsert_async_and_get_async(get_astradb_config, memory_record1):
             with_embedding=True,
         )
     )
+    print(result)
 
     assert result is not None
     assert result._id == memory_record1._id
